@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [
   {
     "title": "A Book",
@@ -6,3 +7,10 @@
     "description": "this is an awesome book"
   }
 ]
+=======
+<<<<<<< HEAD
+[{"title":"Book"},{"title":"Another Book"}]
+=======
+[{"title":"Book"},{"title":"Another Book"},{"title":"Book"}]
+>>>>>>> e4b7ca16957bdcd12a52ba8b07f37c2933b99edd
+>>>>>>> 211b89e341408ccb973c7e581027f29d610a14da
