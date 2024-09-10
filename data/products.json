@@ -1,16 +1,17 @@
-<<<<<<< HEAD
+
 [
   {
+    "id": "1",
     "title": "A Book",
     "imageUrl": "https://media.istockphoto.com/id/495477978/photo/open-book.jpg?s=612x612&w=0&k=20&c=vwJ6__M7CVPdjkQFUv9j2pr7QJiQ9bWW_5jXjR9TcjY=",
     "price": "19",
     "description": "this is an awesome book"
+  },
+  {
+    "title": "Another Book",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxJIaDuO-xG1XJ-lR3B5EDVEz2aufjfHw9zQ&s",
+    "price": "20.99",
+    "description": "Another book amazing",
+    "id": "0.2136220182223496"
   }
 ]
-=======
-<<<<<<< HEAD
-[{"title":"Book"},{"title":"Another Book"}]
-=======
-[{"title":"Book"},{"title":"Another Book"},{"title":"Book"}]
->>>>>>> e4b7ca16957bdcd12a52ba8b07f37c2933b99edd
->>>>>>> 211b89e341408ccb973c7e581027f29d610a14da

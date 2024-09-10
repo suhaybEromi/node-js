@@ -24,11 +24,7 @@ exports.getProducts = (req, res, next) => {
   Product.fetchAll(products => {
     res.render("admin/products", {
       prods: products,
-<<<<<<< HEAD
       pageTitle: "All Products",
-=======
-      pageTitle: "Admin Products",
->>>>>>> e4b7ca16957bdcd12a52ba8b07f37c2933b99edd
       path: "/admin/products",
     });
   });
