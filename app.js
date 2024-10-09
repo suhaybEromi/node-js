@@ -2,6 +2,7 @@ const path = require("path");
 
 const express = require("express");
 const bodyParser = require("body-parser");
+require("dotenv").config();
 
 const errorController = require("./controllers/error");
 const mongoConnect = require("./util/database").mongoConnect;
@@ -19,9 +20,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  User.findById("670183a968ab03104a455d13")
+  User.findById("670577a761cbc5e89ab0a6ac")
     .then(user => {
-      req.user = user;
+      req.user = new User(user.name, user.email, user.cart, user._id);
       next();
     })
     .catch(err => console.log(err));
