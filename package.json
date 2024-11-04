@@ -26,6 +26,7 @@
     "express": "^4.19.2",
     "express-handlebars": "3.0",
     "express-session": "^1.18.1",
+    "mailgen": "^2.0.28",
     "mailgun-js": "^0.22.0",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.2",

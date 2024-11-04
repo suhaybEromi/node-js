@@ -1,11 +1,12 @@
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
-const sendgridTransport = require("nodemailer-sendgrid-transport");
 const User = require("../models/user");
 
-const transporter = nodemailer.createTransport(sendgridTransport, {
+const transporter = nodemailer.createTransport({
+  service: "gmail",
   auth: {
-    user: "api_key",
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
@@ -95,7 +96,7 @@ exports.postSignup = (req, res, next) => {
           res.redirect("/login");
           return transporter.sendMail({
             to: email,
-            from: "suhaibuhammad@gmail.com",
+            from: process.env.EMAIL_USER,
             subject: "Signup succeeded!",
             html: "<h1>You successfully signed up!</h1>",
           });
@@ -111,19 +112,3 @@ exports.postLogout = (req, res, next) => {
     res.redirect("/");
   });
 };
-
-exports.getReset = (req, res, next) => {
-  let message = req.flash("error");
-  if (message.length > 0) {
-    message = message[0];
-  } else {
-    message = null;
-  }
-  res.render("auth/reset", {
-    path: "/reset",
-    pageTitle: "Reset Password",
-    errorMessage: message,
-  });
-};
-
-exports.postReset = (req, res, next) => {};
