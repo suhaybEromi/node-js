@@ -1,8 +1,14 @@
 const fs = require("fs");
 const path = require("path");
-const Product = require("../models/product");
-const Order = require("../models/order");
+
+const stripe = require("stripe")(
+  "sk_test_51QUO9iGYHAgjyyyhFVTJyRpCVNL72i4AtsZexoSUX28kwLAUbMDdR5RL0MexZ9n0GhI03Gr0TZ07X5qtfvwlTTY800muYU41fj",
+);
 const PDFDocument = require("pdfkit");
+
+const Product = require("../models/product");
+const User = require("../models/user");
+const Order = require("../models/order");
 
 const ITEMS_PER_PAGE = 2;
 
@@ -140,32 +146,86 @@ exports.postCartDeleteProduct = (req, res, next) => {
     });
 };
 
-exports.getCheckout = (req, res, next) => {
-  req.user
-    .populate("cart.items.productId")
-    .then(user => {
-      const products = user.cart.items;
-      let total = 0;
-      products.forEach(p => {
-        total += p.quantity * p.productId.price;
-      });
-      res.render("shop/checkout", {
-        path: "/checkout",
-        pageTitle: "Checkout",
-        products: products,
-        totalSum: total,
-      });
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+exports.getCheckout = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).populate(
+      "cart.items.productId",
+    );
+
+    const products = user.cart.items;
+    const total = products.reduce(
+      (sum, p) => sum + p.quantity * p.productId.price,
+      0,
+    );
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: products.map(p => ({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: p.productId.title,
+            description: p.productId.description,
+          },
+          unit_amount: p.productId.price * 100,
+        },
+        quantity: p.quantity,
+      })),
+      mode: "payment",
+      success_url: req.protocol + "://" + req.get("host") + "/checkout/success",
+      cancel_url: req.protocol + "://" + req.get("host") + "/checkout/cancel",
     });
+
+    res.render("shop/checkout", {
+      path: "/checkout",
+      pageTitle: "Checkout",
+      products: products,
+      totalSum: total,
+      sessionId: session.id,
+    });
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
+  }
+};
+
+exports.getCheckoutSuccess = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).populate(
+      "cart.items.productId",
+    );
+
+    // Save the order
+    const order = new Order({
+      user: {
+        userId: user._id,
+        email: user.email,
+      },
+      products: user.cart.items.map(p => ({
+        product: { ...p.productId._doc },
+        quantity: p.quantity,
+      })),
+    });
+    await order.save();
+
+    // Clear the cart
+    user.cart.items = [];
+    await user.save();
+
+    // Redirect to orders page
+    res.redirect("/orders");
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    next(error);
+  }
 };
 
 exports.postOrder = (req, res, next) => {
   req.user
     .populate("cart.items.productId")
+    .execPopulate()
     .then(user => {
       const products = user.cart.items.map(i => {
         return { quantity: i.quantity, product: { ...i.productId._doc } };
